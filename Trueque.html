@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Trueque - App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .phone-frame {
+            width: 350px;
+            border: 2px solid #000;
+            border-radius: 15px;
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            overflow: hidden;
+            background: white;
+            display: flex;
+            flex-direction: column;
+            height: 600px;
+        }
+        .container {
+            padding: 20px;
+            text-align: center;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .container.scrollable {
+            overflow-y: auto;
+            justify-content: flex-start;
+        }
+        p {
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        h2, h3 {
+            margin-top: 5px;
+            margin-bottom: 15px;
+        }
+        img {
+            height: auto;
+            display: block;
+            border-radius: 5px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn-ingresar {
+            background-color: #015965;
+            color: white;
+        }
+        .btn-registrar {
+            background-color: #e0e0e0;
+            color: #015965;
+            font-weight: bold;
+        }
+        .btn-crear, .btn-verificar, .btn-enviar, .btn-request, .btn-agregar {
+            background-color: #015965;
+            color: white;
+            font-weight: bold;
+        }
+        .btn-demo {
+            background-color: white;
+            color: red;
+            font-weight: bold;
+        }
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+        .checkbox-container input {
+            width: auto;
+            margin-right: 5px;
+        }
+        .code-inputs {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin: 15px 0;
+        }
+        .code-inputs input {
+            width: 40px;
+            text-align: center;
+            font-size: 18px;
+        }
+        .screen {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+        }
+        .screen.active {
+            display: flex;
+        }
+        .categories {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+        .categories button {
+            background-color: #7ab58c;
+            border: none;
+            border-radius: 15px;
+            padding: 5px 10px;
+            color: white;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .categories button:hover {
+            background-color: #659d6d;
+        }
+        .product {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 10px 0 0;
+            margin-bottom: 10px;
+        }
+        .product-info {
+            text-align: left;
+            flex: 1;
+        }
+        .product-info strong {
+            display: block;
+            font-size: 16px;
+            margin-bottom: 3px;
+            color: #000;
+        }
+        .product-info p {
+            font-size: 12px;
+            color: gray;
+            margin: 0;
+        }
+        .product img {
+            width: 80px;
+            height: auto;
+            border-radius: 5px;
+            margin-left: 10px;
+            object-fit: cover;
+        }
+        .bottom-nav {
+            display: flex;
+            justify-content: space-around;
+            border-top: 1px solid #ccc;
+            padding: 10px 0;
+            font-size: 18px;
+            position: relative;
+            background-color: white;
+            z-index: 10;
+        }
+        .bottom-nav span {
+            cursor: pointer;
+        }
+
+        /* Nuevos estilos para la pantalla de chat */
+        .chat-header, .profile-header, .review-header, .upload-screen .header, .notifications-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .chat-header .left-section {
+            display: flex;
+            align-items: center;
+        }
+        .back-btn, .close-btn {
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+        .chat-header h4, .profile-header h4, .review-header h4, .upload-screen .header h4, .notifications-header h4 {
+            flex-grow: 1;
+            text-align: center;
+            margin: 0;
+            font-size: 16px;
+        }
+        .chat-header .call-btn {
+            font-size: 24px;
+        }
+        .chat-body {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .chat-exchange-info {
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .chat-exchange-info img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            margin-left: 10px;
+        }
+        .chat-exchange-info .text-info {
+            flex-grow: 1;
+            text-align: left;
+        }
+        .chat-exchange-info p {
+            font-weight: normal;
+            font-size: 12px;
+            color: gray;
+            margin: 0;
+        }
+        .chat-exchange-info h5 {
+            margin: 0;
+            font-size: 14px;
+        }
+        .chat-message {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        .chat-message.me {
+            justify-content: flex-end;
+        }
+        .chat-message .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .chat-message.me .avatar {
+            margin-right: 0;
+            margin-left: 10px;
+        }
+        .chat-message .message-bubble {
+            background-color: #e0e0e0;
+            padding: 10px;
+            border-radius: 15px;
+            max-width: 70%;
+        }
+        .chat-message.me .message-bubble {
+            background-color: #015965;
+            color: white;
+        }
+        .chat-input-area {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-top: 1px solid #eee;
+            position: relative;
+        }
+        .chat-input-area input {
+            flex-grow: 1;
+            margin: 0 10px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            border: 1px solid #ccc;
+        }
+        .chat-input-area .icon-btn {
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+        }
+        /* El botón "+" del chat */
+        .chat-input-area .add-btn {
+            width: 40px;
+            height: 40px;
+            background-color: #015965;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            position: absolute;
+            top: -20px;
+            right: 15px;
+        }
+        .chat-input-area input {
+            padding-right: 50px;
+        }
+
+        /* Estilos para la pantalla de perfil */
+        .profile-content {
+            text-align: center;
+            padding: 20px;
+        }
+        .profile-content .avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+        .profile-content h3 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .profile-content .rating {
+            font-size: 16px;
+            color: gray;
+            margin-bottom: 20px;
+        }
+        .profile-content .rating .star {
+            color: gold;
+        }
+        .profile-tabs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+        .profile-tabs button {
+            background: none;
+            border: none;
+            padding: 10px 0;
+            font-size: 14px;
+            color: #888;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+        }
+        .profile-tabs button.active-tab {
+            color: #015965;
+            border-bottom: 2px solid #015965;
+            font-weight: bold;
+        }
+        .trueques-list {
+            padding: 0 20px;
+            text-align: left;
+            width: 100%;
+        }
+        .trueque-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .trueque-item .item-info {
+            display: flex;
+            flex-direction: column;
+            text-align: left;
+            flex-grow: 1;
+        }
+        .trueque-item .item-info strong {
+            font-size: 16px;
+        }
+        .trueque-item .item-info span {
+            font-size: 12px;
+            color: gray;
+        }
+        .trueque-item img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            margin-left: 10px;
+        }
+        .trueque-item .rating-info {
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            color: #000;
+            margin-top: 5px;
+        }
+        .trueque-item .rating-info .star {
+            color: gold;
+            margin-left: 3px;
+        }
+        .completed-info {
+            font-size: 12px;
+            color: gray;
+            margin-bottom: 3px;
+        }
+        .intercambiada-con {
+            font-size: 12px;
+            color: gray;
+        }
+
+        /* Estilos para la pantalla de calificación */
+        .review-screen .container {
+            padding: 0;
+        }
+        .review-content {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .rating-summary {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .rating-summary h2 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+        .rating-summary .overall-score {
+            font-size: 48px;
+            font-weight: bold;
+            color: #000;
+            margin-right: 10px;
+        }
+        .rating-summary .stars {
+            font-size: 24px;
+            color: #ccc;
+        }
+        .rating-summary .reviews-count {
+            font-size: 14px;
+            color: gray;
+        }
+        .rating-bars {
+            flex-grow: 1;
+        }
+        .rating-bar-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .rating-bar-row .label {
+            width: 15px;
+            text-align: right;
+            font-size: 14px;
+            margin-right: 5px;
+            color: #000;
+        }
+        .rating-bar-row .bar-container {
+            flex-grow: 1;
+            height: 8px;
+            background-color: #eee;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .rating-bar-row .bar {
+            height: 100%;
+            background-color: #7ab58c;
+            border-radius: 4px;
+            width: 0%;
+        }
+        .rating-bar-row .percentage {
+            width: 35px;
+            font-size: 14px;
+            color: gray;
+        }
+        textarea {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .btn-enviar {
+            background-color: #015965;
+            color: white;
+            font-weight: bold;
+            width: calc(100% - 40px);
+            margin: 0 20px 20px;
+        }
+
+        /* Estilos para la pantalla de subir producto */
+        .upload-screen .container {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .upload-area p {
+            font-weight: bold;
+            color: #555;
+            margin: 0 0 5px 0;
+        }
+        .upload-area span {
+            font-size: 12px;
+            color: gray;
+        }
+        .upload-area button {
+            width: auto;
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            color: #000;
+            font-weight: normal;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+        .upload-screen .publish-btn {
+            background-color: #015965;
+            color: white;
+            font-weight: bold;
+        }
+        .upload-screen .header h4 {
+            flex-grow: 1;
+        }
+        .input-label {
+            text-align: left;
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        /* Estilos para la nueva pantalla de Notificaciones */
+        .notifications-screen .container {
+            padding: 0;
+            text-align: left;
+        }
+        .notifications-header {
+            border-bottom: 1px solid #ccc;
+            padding: 15px;
+            text-align: center;
+            position: relative;
+        }
+        .notifications-header .back-btn {
+            position: absolute;
+            left: 15px;
+        }
+        .notification-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .notification-item .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+        .notification-item .notification-content {
+            flex-grow: 1;
+        }
+        .notification-content .message {
+            font-size: 16px;
+            color: #000;
+            margin: 0;
+        }
+        .notification-content .time {
+            font-size: 12px;
+            color: gray;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-frame">
+        <div class="container screen active" id="loginScreen">
+            <p>Bienvenido a Trueque</p>
+            <h2>Trueque</h2>
+            <img src="Inicio de sesion.png" alt="Imagen Trueque" style="width:150px; margin:auto;" />
+            <input type="email" placeholder="Correo electrónico" />
+            <input type="password" placeholder="Contraseña" />
+            <button class="btn-ingresar" onclick="showScreen('homeScreen')">Ingresar</button>
+            <button class="btn-registrar" onclick="showScreen('registerScreen')">REGISTRAR</button>
+        </div>
+
+        <div class="container screen" id="registerScreen">
+            <h3 style="text-align: left; width: 100%;">Crear una cuenta</h3>
+            <input type="text" placeholder="Nombre completo" />
+            <input type="email" placeholder="Email" />
+            <input type="tel" placeholder="Teléfono" />
+            <input type="password" placeholder="Contraseña" />
+            <input type="password" placeholder="Confirmar contraseña" />
+            <div class="checkbox-container">
+                <input type="checkbox" id="termsCheckbox" />
+                <label>Acepto los Términos y Condiciones</label>
+            </div>
+            <button class="btn-crear" onclick="checkTerms()">Crear Cuenta</button>
+            <button class="btn-demo" onclick="showScreen('loginScreen')">← Volver</button>
+        </div>
+
+        <div class="container screen" id="verifyScreen">
+            <h3>Introduce el código</h3>
+            <p style="font-weight: normal; font-size: 13px; color: #555;">
+                Te enviamos un código de 6 dígitos a tu correo electrónico. El código caduca en 10 minutos
+            </p>
+            <div class="code-inputs">
+                <input type="text" maxlength="1" />
+                <input type="text" maxlength="1" />
+                <input type="text" maxlength="1" />
+                <input type="text" maxlength="1" />
+                <input type="text" maxlength="1" />
+                <input type="text" maxlength="1" />
+            </div>
+            <a href="#" style="font-size: 12px; display: block; margin-bottom: 15px;">Volver a pedir código</a>
+            <button class="btn-verificar" onclick="showScreen('emailVerifiedScreen')">Verificar</button>
+            <button class="btn-demo" onclick="showScreen('registerScreen')">← Volver</button>
+        </div>
+
+        <div class="container screen" id="emailVerifiedScreen">
+            <h3 style="font-weight: bold;">¡Correo electrónico verificado exitosamente!</h3>
+            <p style="color: #777; font-size: 13px;">Ahora puedes continuar con la app.</p>
+            <button class="btn-verificar" onclick="showScreen('loginScreen')">Continuar</button>
+        </div>
+
+        <div class="screen" id="homeScreen">
+            <div class="container scrollable">
+                <h3 style="width: 100%; text-align: left;">Trueque</h3>
+                <div class="categories" style="width: 100%;">
+                    <button>Todos</button>
+                    <button>Ropa</button>
+                    <button>Electrónica</button>
+                    <button>Hogar</button>
+                </div>
+
+                <div class="product" style="width: 100%;">
+                    <div class="product-info">
+                        <strong>Chaqueta de cuero</strong>
+                        <p>Ubicación: 2 km</p>
+                    </div>
+                    <img src="Home.png" alt="Chaqueta" />
+                </div>
+                <button class="btn-request" onclick="showScreen('productDetailScreen')">Solicitar intercambio</button>
+            </div>
+            <div class="bottom-nav">
+                <span onclick="showScreen('homeScreen')">🏠</span>
+                <span onclick="showScreen('notificationsScreen')">🔔</span>
+                <span onclick="showScreen('uploadScreen')">➕</span>
+                <span onclick="showScreen('chatScreen')">💬</span>
+                <span onclick="showScreen('profileScreen')">👤</span>
+            </div>
+        </div>
+
+        <div class="screen upload-screen" id="uploadScreen">
+            <div class="header">
+                <span class="back-btn" onclick="showScreen('homeScreen')">←</span>
+                <h4>Subir producto para trueque</h4>
+                <div style="width: 24px;"></div>
+            </div>
+            <div class="container scrollable">
+                <div class="upload-area">
+                    <p>Subir foto del producto</p>
+                    <span>Toca para subir una foto</span>
+                    <button>Subir foto</button>
+                </div>
+                <label for="productName" class="input-label" style="width: 100%;">Nombre del producto</label>
+                <input type="text" id="productName" placeholder="" />
+                <label for="productLocation" class="input-label" style="width: 100%;">Ubicación</label>
+                <input type="text" id="productLocation" placeholder="" />
+            </div>
+            <button class="btn-crear" style="margin: 0 20px 20px; width: calc(100% - 40px);">Publicar producto</button>
+        </div>
+
+        <div class="screen" id="productDetailScreen">
+            <div class="container scrollable" style="padding: 0;">
+                <img src="Informacion.png" alt="Chaqueta de cuero" style="width: 100%; border-radius: 0; margin: 0;">
+                <div style="padding: 15px;">
+                    <h3 style="text-align: left; margin: 0;">Chaqueta de cuero vintage</h3>
+                    <p style="font-weight: normal; font-size: 14px; color: #333; text-align: left;">
+                        Chaqueta de cuero marrón con diseño clásico, botones al frente y bolsillos laterales.
+                        Está en excelente estado y es ideal para añadir un toque de estilo atemporal a cualquier atuendo.
+                        Fabricada con cuero de alta calidad y forro cómodo.
+                    </p>
+                    <p style="text-align: left; font-weight: bold; margin-top: 10px; margin-bottom: 5px;">Ubicación</p>
+                    <span style="display: block; text-align: left; font-size: 14px; font-weight: normal;">Tepeji del Río, Hidalgo</span>
+                    <p style="text-align: left; font-weight: bold; margin-top: 10px; margin-bottom: 5px;">Propietario</p>
+                    <div style="display: flex; align-items: center; margin-bottom: 15px; text-align: left;">
+                        <img src="Alex.png" alt="Perfil" style="border-radius: 50%; margin-right: 10px; width: 40px; height: 40px;">
+                        <div>
+                            <strong>Alex Morgan</strong>
+                            <span style="font-size: 12px; color: gray; display: block;">@alex_m</span>
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 0 15px;">
+                    <button class="btn-request" onclick="showScreen('chatScreen')">
+                        Enviar solicitud de trueque
+                    </button>
+                    <button style="background: none; color: #015965; padding: 10px; border: none; font-weight: bold; width: 100%; cursor: pointer;" onclick="showScreen('reviewScreen')">
+                        Calificar Trueque
+                    </button>
+                    <button class="btn-demo" onclick="showScreen('homeScreen')">← Volver</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="screen" id="chatScreen">
+            <div class="chat-header">
+                <div class="left-section">
+                    <span class="back-btn" onclick="showScreen('homeScreen')">←</span>
+                    <h4>@Alex Morgan</h4>
+                </div>
+                <span class="call-btn">📞</span>
+            </div>
+            <div class="chat-body">
+                <div class="chat-exchange-info" style="align-self: flex-start;">
+                    <div class="text-info">
+                        <p>Solicitando intercambio</p>
+                        <h5>Chaqueta cuero vintage</h5>
+                    </div>
+                    <img src="Mensaje.png" alt="Chaqueta" />
+                </div>
+                <div class="chat-message me">
+                    <div class="message-bubble">
+                        Hola! Me interesa tu chaqueta
+                    </div>
+                    <img src="Oferta.png" alt="Tu avatar" class="avatar" />
+                </div>
+                <div id="offerMessage" class="chat-message me" style="display: none;">
+                    <div class="chat-exchange-info">
+                        <div class="text-info">
+                            <h5>Chaqueta de cuero</h5>
+                            <p>Ubicación: 2 km</p>
+                        </div>
+                        <img src="Quieres.png" alt="Chaqueta de cuero" />
+                    </div>
+                    <div class="message-bubble">
+                        Te ofrezco esta chaqueta a cambio
+                    </div>
+                    <img src="Perfil.png" alt="Tu avatar" class="avatar" />
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <div class="add-btn" onclick="showScreen('profileScreen')">➕</div>
+                <input type="text" placeholder="Escribe un mensaje..." />
+                <span class="icon-btn">🖼️</span>
+                <span class="icon-btn">🎤</span>
+            </div>
+            <div class="bottom-nav">
+                <span onclick="showScreen('homeScreen')">🏠</span>
+                <span onclick="showScreen('notificationsScreen')">🔔</span>
+                <span onclick="showScreen('uploadScreen')">➕</span>
+                <span onclick="showScreen('chatScreen')">💬</span>
+                <span onclick="showScreen('profileScreen')">👤</span>
+            </div>
+        </div>
+
+        <div class="screen profile-screen" id="profileScreen">
+            <div class="profile-header">
+                <span class="back-btn" onclick="showScreen('homeScreen')">←</span>
+                <h4>Perfil</h4>
+                <div style="width: 24px;"></div>
+            </div>
+            <div class="profile-content">
+                <img src="Perfil.png" alt="Avatar de Amaury" class="avatar-large" />
+                <h3>Amaury</h3>
+                <div class="rating">
+                    4.8 <span class="star">★</span>
+                </div>
+                <div class="profile-tabs">
+                    <button id="active-tab-btn" class="active-tab" onclick="toggleTrueques('active')">Trueques Activos</button>
+                    <button id="completed-tab-btn" onclick="toggleTrueques('completed')">Trueques Completados</button>
+                </div>
+                <div id="trueques-activos" class="trueques-list">
+                    <div class="trueque-item">
+                        <div class="item-info">
+                            <strong>Chaqueta de cuero</strong>
+                            <span>Ubicación: 2 km</span>
+                        </div>
+                        <img src="Activo.png" alt="Chaqueta de cuero" />
+                        <button class="btn-agregar" onclick="addOfferToChat()">Agregar</button>
+                    </div>
+                </div>
+                <div id="trueques-completados" class="trueques-list" style="display: none;">
+                    <div class="trueque-item">
+                        <div class="item-info">
+                            <span class="completed-info">Completed</span>
+                            <strong>Chaqueta de cuero vintage</strong>
+                            <span class="intercambiada-con">Intercambiada con @liam</span>
+                            <div class="rating-info">5.0<span class="star">★</span></div>
+                        </div>
+                        <img src="Chaqueta de cuero.png" alt="Chaqueta de cuero" />
+                    </div>
+                    <div class="trueque-item">
+                        <div class="item-info">
+                            <span class="completed-info">Completed</span>
+                            <strong>Taza de cerámica hecha a mano</strong>
+                            <span class="intercambiada-con">Intercambiada con @olivia</span>
+                            <div class="rating-info">5.0<span class="star">★</span></div>
+                        </div>
+                        <img src="Taza.png" alt="Taza de cerámica" />
+                    </div>
+                </div>
+            </div>
+            <div class="bottom-nav">
+                <span onclick="showScreen('homeScreen')">🏠</span>
+                <span onclick="showScreen('notificationsScreen')">🔔</span>
+                <span onclick="showScreen('uploadScreen')">➕</span>
+                <span onclick="showScreen('chatScreen')">💬</span>
+                <span onclick="showScreen('profileScreen')">👤</span>
+            </div>
+        </div>
+
+        <div class="screen review-screen" id="reviewScreen">
+            <div class="review-header">
+                <span class="close-btn" onclick="showScreen('productDetailScreen')">✕</span>
+                <h4>Califica tu trueque</h4>
+                <div style="width: 24px;"></div>
+            </div>
+            <div class="container scrollable" style="justify-content: flex-start;">
+                <h2 style="text-align: left; width: 100%; margin-bottom: 5px;">Como fue tu experiencia con Alex?</h2>
+                <div style="display: flex; align-items: center; width: 100%;">
+                    <div class="rating-summary" style="width: 150px; text-align: left; margin-bottom: 0;">
+                        <div style="display: flex; align-items: center;">
+                            <span class="overall-score">0</span>
+                            <div style="display: flex; flex-direction: column; text-align: left;">
+                                <div class="stars">☆☆☆☆☆</div>
+                                <span class="reviews-count">0 Reseñas</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rating-bars" style="flex-grow: 1;">
+                        <div class="rating-bar-row">
+                            <span class="label">5</span>
+                            <div class="bar-container"><div class="bar" style="width: 0%;"></div></div>
+                            <span class="percentage">0%</span>
+                        </div>
+                        <div class="rating-bar-row">
+                            <span class="label">4</span>
+                            <div class="bar-container"><div class="bar" style="width: 0%;"></div></div>
+                            <span class="percentage">0%</span>
+                        </div>
+                        <div class="rating-bar-row">
+                            <span class="label">3</span>
+                            <div class="bar-container"><div class="bar" style="width: 0%;"></div></div>
+                            <span class="percentage">0%</span>
+                        </div>
+                        <div class="rating-bar-row">
+                            <span class="label">2</span>
+                            <div class="bar-container"><div class="bar" style="width: 0%;"></div></div>
+                            <span class="percentage">0%</span>
+                        </div>
+                        <div class="rating-bar-row">
+                            <span class="label">1</span>
+                            <div class="bar-container"><div class="bar" style="width: 0%;"></div></div>
+                            <span class="percentage">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="text-align: left; width: 100%; margin-top: 20px; margin-bottom: 5px;">Que te gusto?</h3>
+                <textarea placeholder="Escribe aquí..." style="width: 100%;"></textarea>
+
+                <h3 style="text-align: left; width: 100%; margin-bottom: 5px;">Que podria mejorar?</h3>
+                <textarea placeholder="Escribe aquí..." style="width: 100%;"></textarea>
+            </div>
+            <button class="btn-enviar" style="margin: 0 20px 20px; width: calc(100% - 40px);">Enviar</button>
+        </div>
+
+        <div class="screen" id="notificationsScreen">
+            <div class="notifications-header">
+                <span class="back-btn" onclick="showScreen('homeScreen')">←</span>
+                <h4>Notificaciones</h4>
+                <div style="width: 24px;"></div>
+            </div>
+            <div class="container scrollable" style="justify-content: flex-start; padding-top: 0;">
+                <div class="notification-item">
+                    <img src="Liam.png" alt="Avatar" class="avatar" />
+                    <div class="notification-content">
+                        <p class="message"><strong>Liam</strong> te ha enviado una solicitud de intercambio para "Cámara vintage"</p>
+                        <p class="time">Hace 5 minutos</p>
+                    </div>
+                </div>
+                <div class="notification-item">
+                    <img src="Alex.png" alt="Avatar" class="avatar" />
+                    <div class="notification-content">
+                        <p class="message">Tu trueque con <strong>Olivia</strong> ha sido completado</p>
+                        <p class="time">Hace 1 hora</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bottom-nav">
+                <span onclick="showScreen('homeScreen')">🏠</span>
+                <span onclick="showScreen('notificationsScreen')">🔔</span>
+                <span onclick="showScreen('uploadScreen')">➕</span>
+                <span onclick="showScreen('chatScreen')">💬</span>
+                <span onclick="showScreen('profileScreen')">👤</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showScreen(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function checkTerms() {
+            const checkbox = document.getElementById('termsCheckbox');
+            if (checkbox.checked) {
+                showScreen('verifyScreen');
+            } else {
+                alert('Debes aceptar los Términos y Condiciones para continuar.');
+            }
+        }
+
+        function toggleTrueques(type) {
+            const activeTrueques = document.getElementById('trueques-activos');
+            const completedTrueques = document.getElementById('trueques-completados');
+            const activeTabBtn = document.getElementById('active-tab-btn');
+            const completedTabBtn = document.getElementById('completed-tab-btn');
+
+            if (type === 'active') {
+                activeTrueques.style.display = 'block';
+                completedTrueques.style.display = 'none';
+                activeTabBtn.classList.add('active-tab');
+                completedTabBtn.classList.remove('active-tab');
+            } else {
+                activeTrueques.style.display = 'none';
+                completedTrueques.style.display = 'block';
+                activeTabBtn.classList.remove('active-tab');
+                completedTabBtn.classList.add('active-tab');
+            }
+        }
+
+        function addOfferToChat() {
+            const offerMessage = document.getElementById('offerMessage');
+            offerMessage.style.display = 'flex';
+            showScreen('chatScreen');
+        }
+    </script>
+</body>
+</html>
